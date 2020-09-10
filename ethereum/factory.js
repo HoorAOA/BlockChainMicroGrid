@@ -4,7 +4,6 @@ import ExchangeFactory from './build/ExchangeFactory.json';
 
 const instance = new web3.eth.Contract(
     JSON.parse(ExchangeFactory.interface),
-    '0x473781C7353577f87AA3162A3153F1a63cAC839B'
+    '0xE8e4Dec9c55274E366d35ed1Bd2FbB09cEcB12fD'
 );
-
 export default instance;

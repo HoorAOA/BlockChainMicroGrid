@@ -27,6 +27,7 @@ contract Exchange {
         uint units;
         uint price;
         address manager;
+        uint ExchangeNo;
     }
     
     address public manager;
@@ -44,7 +45,7 @@ contract Exchange {
         
     }
     
-    function createRequest(uint Price, address recipient, uint Units) 
+    function createRequest(uint Price, address recipient, uint Units, uint ExchangeNo) 
         public restricted {
         
         ExchangeRequest memory newExchangeRequest = ExchangeRequest({
@@ -52,7 +53,8 @@ contract Exchange {
             units: Units,
             price: Price,
             complete: false,
-            recipient: recipient
+            recipient: recipient,
+            ExchangeNo: ExchangeNo
         });
         
         exchangeRequests.push(newExchangeRequest);
@@ -79,10 +81,15 @@ contract Exchange {
     }
 
     // function getSummary() public view returns (
-    //     address, uint, uint, uint, address
+    //     address, bool, uint, uint, address, uint
     // ) {
     //     return (
-    //     manager
+    //     recipient,
+    //     complete,
+    //     units,
+    //     price,
+    //     manager,
+    //     ExchangeNo
     //     );
     // }
 

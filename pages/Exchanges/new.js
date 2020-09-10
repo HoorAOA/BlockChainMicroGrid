@@ -28,21 +28,48 @@ class ExchangeNew extends Component {
         const accounts = await web3.eth.getAccounts();
         const { PowerUnits, Price, recipient} = this.state;
 
-        var AllExchanges = await factory.methods.getDeployedExchanges().call();
+        const AllExchanges = await factory.methods.getDeployedExchanges().call();
 
-        if ((AllExchanges.length == 0)){
+
+        var m = 0;
+        var currentExchange = [];
+        var requestCount = 0;
+        var AllRequests = [];
+        var requests = [];
+        if(AllExchanges.length != 0){
+            for (var j = 0; j < AllExchanges.length; j++){
+                currentExchange = await Exchange(AllExchanges[j]);
+                requestCount = await currentExchange.methods.getRequestsCount().call();
+                requests = await Promise.all(
+                    Array(parseInt(requestCount)).fill().map((element, index) => {
+                        return currentExchange.methods.exchangeRequests(index).call()
+                    })
+                );
+                AllRequests.push.apply(AllRequests, requests);
+            }
+        }
+
+        var n = AllRequests.filter(function(item){
+            if(item.manager == accounts[0])
+                return typeof item.ExchangeNo ==='string';  
+        });
+
+        m = n[0].ExchangeNo;
+
+        if (AllExchanges.length == 0){
             await factory.methods.createExchange()
                 .send({ from: accounts[0]});
             AllExchanges = await factory.methods.getDeployedExchanges().call();
+            m = AllExchanges.length - 1;
         }
-
-        const exchange = Exchange(AllExchanges[0]);
+        
+        const exchange = Exchange(AllExchanges[m]);
         try{
             await exchange.methods
                 .createRequest(
                     web3.utils.toWei(Price, 'ether'),
                     recipient, 
-                    PowerUnits).send({ from: accounts[0]});
+                    PowerUnits, m).send({ from: accounts[0]});
             
            
             Router.pushRoute('/');
